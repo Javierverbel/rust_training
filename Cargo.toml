@@ -1,6 +1,6 @@
 
-[Workspace]
+[workspace]
 resolver = "2"
 members = [
- "p12"
+ "p12",
 ]
