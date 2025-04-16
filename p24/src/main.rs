@@ -31,8 +31,8 @@ struct TwoValues<'a, 'b> {
     second: &'b usize,
 }
 
-impl TwoValues<'a, 'b> {
-    pub fn new(first: &'a usize, second: &usize) -> Self {
+impl<'a, 'b> TwoValues<'a, 'b> {
+    pub fn new(first: &'a usize, second: &'b usize) -> Self {
         Self { first, second }
     }
 
