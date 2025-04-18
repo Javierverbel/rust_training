@@ -3,15 +3,23 @@
 pub struct User {
     name: String,
     credit_line: u64,
-    balance: i16,
+    balance: i64,
 }
 impl User {
-    fn new(name: String) -> User {
+    fn new(name: String, init_balance: i64) -> User {
         User {
             name,
             credit_line: 0,
-            balance: 0,
+            balance: init_balance,
         }
+    }
+
+    fn update_balance(&mut self, amount: i64) {
+        self.balance += amount;
+    }
+
+    fn set_credit_line(&mut self, amount_credit: u64) {
+        self.credit_line = amount_credit;
     }
 }
 
@@ -33,10 +41,14 @@ impl Bank {
         }
     }
 
-    pub fn create_user(&mut self, user_name: String) {
-        let user = User::new(user_name);
+    pub fn create_user(&mut self, user_name: String, init_balance: i64) {
+        let user = User::new(user_name, init_balance);
         self.add_user(user);
     }
+
+    // pub fn update_user_balance(&mut self, user_name: &str){
+    //     get_user_idx(&self, user_name: &str)
+    // }
 
     fn calc_balance(&self) -> i64 {
         let mut bal = 0i64;
@@ -66,10 +78,10 @@ impl Bank {
             ));
         };
 
-        match self.users[origin_user_idx].balance >= amount as i16 {
+        match self.users[origin_user_idx].balance >= amount as i64 {
             true => {
-                self.users[origin_user_idx].balance -= amount as i16;
-                self.users[destination_user_idx].balance += amount as i16;
+                self.users[origin_user_idx].update_balance(-(amount as i64));
+                self.users[destination_user_idx].update_balance(amount as i64);
                 Ok(true)
             }
             false => Err(format!(
@@ -81,9 +93,10 @@ impl Bank {
     fn accrue_interest(&mut self) {
         for user_idx in 0..self.users.len() {
             let user = &mut self.users[user_idx];
-            if user.balance > 0 {
-                user.balance +=
-                    (self.credit_interest as i16 + self.debit_interest as i16) * (user.balance);
+            if user.balance >= 0 {
+                user.balance += (self.debit_interest as i64) * user.balance;
+            } else {
+                user.balance += (self.credit_interest as i64) * user.balance;
             }
         }
     }
